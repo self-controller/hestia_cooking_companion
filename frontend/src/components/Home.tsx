@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 function Home() {
   return (
     <>
-      <Navbar/>
+      <Navbar />
       <div className="min-h-screen flex flex-col justify-center items-center text-[#DD0303] px-6 py-16 relative overflow-hidden bg-gradient-to-br from-[#FEF3E2] via-[#FFF8F0] to-[#FEF3E2] bg-[length:400%_400%] animate-[gradient-shift_15s_ease_infinite]">
         {/* Floating Shapes Background */}
         <div className="absolute w-[200px] h-[200px] rounded-full bg-[radial-gradient(circle,#FA812F,transparent)] top-[10%] left-[10%] opacity-15 blur-[1px] pointer-events-none animate-[float_20s_ease-in-out_infinite]"></div>
@@ -40,15 +40,16 @@ function Home() {
 
             <p className="text-base md:text-lg text-[#DD0303]/80 leading-relaxed opacity-0 animate-[fade-in-up_0.8s_ease-out_forwards] [animation-delay:0.6s] font-['Montserrat',sans-serif] font-semibold tracking-[0.01em]">
               We help home cooks push past the ordinary with curated recipes,
-              hands-on guidance, and a community that celebrates experimentation.
-              Create meals that surprise, delight, and bring people together.
+              hands-on guidance, and a community that celebrates
+              experimentation. Create meals that surprise, delight, and bring
+              people together.
             </p>
           </section>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 opacity-0 animate-[fade-in-up_0.8s_ease-out_forwards] [animation-delay:0.8s]">
-            <button 
+            <button
               className="w-full sm:w-auto rounded-full bg-[#DD0303] px-8 py-3 text-base font-bold text-[#FEF3E2] shadow-lg shadow-[#DD0303]/30 transition hover:bg-[#FA812F] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FA812F]/60 font-['Montserrat',sans-serif] tracking-[0.05em]"
-              onClick ={() => (window.location.href = "/register")}
+              onClick={() => (window.location.href = "/register")}
             >
               Get Started
             </button>
