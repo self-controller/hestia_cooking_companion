@@ -2,13 +2,40 @@ import { useState, useEffect } from "react";
 
 function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<{ id: number; username: string; email: string } | null>(null);
   const [isHomepage, setIsHomepage] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Function to check authentication status via API
+  const checkAuth = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/auth/me", {
+        method: "GET",
+        credentials: "include", // Required for cookies
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        setIsLoggedIn(true);
+        setUser(userData);
+      } else {
+        // 401 or other error - not authenticated
+        setIsLoggedIn(false);
+        setUser(null);
+      }
+    } catch (error) {
+      // Network error or other issue
+      setIsLoggedIn(false);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem("access_token");
-    setIsLoggedIn(!!token);
+    // Check authentication status on mount
+    checkAuth();
 
     // Check if on homepage
     setIsHomepage(window.location.pathname === "/");
@@ -19,16 +46,8 @@ function Navbar() {
     };
     window.addEventListener("popstate", handlePopState);
 
-    // Listen for storage changes (login/logout)
-    const handleStorageChange = () => {
-      const token = localStorage.getItem("access_token");
-      setIsLoggedIn(!!token);
-    };
-    window.addEventListener("storage", handleStorageChange);
-
     return () => {
       window.removeEventListener("popstate", handlePopState);
-      window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
 
@@ -48,19 +67,34 @@ function Navbar() {
     setDropdownOpen(false);
   };
 
-  const handleLogoutClick = () => {
-    // Clear authentication
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user");
-    setIsLoggedIn(false);
-    setDropdownOpen(false);
-    // Redirect to home
-    window.location.href = "/";
+  const handleLogoutClick = async () => {
+    try {
+      // Call backend logout endpoint
+      await fetch("http://localhost:8000/logout", {
+        method: "POST",
+        credentials: "include", // Required for cookies
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // Clear local state regardless of API call result
+      setIsLoggedIn(false);
+      setUser(null);
+      localStorage.removeItem("user"); // Clear any cached user data
+      setDropdownOpen(false);
+      // Redirect to home
+      window.location.href = "/";
+    }
   };
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
+
+  // Don't render until we've checked auth status
+  if (loading) {
+    return <nav>Loading...</nav>; // Or return null, or a loading spinner
+  }
 
   return (
     <nav>

@@ -17,6 +17,7 @@ function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -29,14 +30,9 @@ function LoginPage() {
 
       const data = await response.json();
 
-      // Store token if provided
-      if (data.access_token) {
-        localStorage.setItem("access_token", data.access_token);
-      }
-
       // Store user info if provided
-      if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
+      if (data.id) {
+        localStorage.setItem("user", JSON.stringify(data));
       }
 
       // Redirect to home or dashboard

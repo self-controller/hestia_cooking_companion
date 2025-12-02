@@ -4,7 +4,7 @@ function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -21,12 +21,13 @@ function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/auth/register", {
+      const response = await fetch("http://localhost:8000/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, name }),
+        credentials: "include",
+        body: JSON.stringify({ email, password, username }),
       });
 
       if (!response.ok) {
@@ -38,14 +39,9 @@ function RegisterPage() {
 
       const data = await response.json();
 
-      // Store token if provided
-      if (data.access_token) {
-        localStorage.setItem("access_token", data.access_token);
-      }
-
       // Store user info if provided
-      if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
+      if (data.id) {
+        localStorage.setItem("user", JSON.stringify(data));
       }
 
       // Redirect to home or dashboard
@@ -66,12 +62,12 @@ function RegisterPage() {
       <h1>Register</h1>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="name">Name:</label>
+          <label htmlFor="username">Username:</label>
           <input
-            id="name"
+            id="username"
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>

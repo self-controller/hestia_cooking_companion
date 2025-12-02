@@ -16,9 +16,9 @@ def hash_password(password):
     
     # Generate a random salt
     salt = bcrypt.gensalt()
-    
-    # Hash the password with the generated salt
     hashed_password = bcrypt.hashpw(password_bytes, salt)
+    # Hash the password with the generated salt
+    hashed_password = hashed_password.decode('utf-8')
     
     return hashed_password
 
