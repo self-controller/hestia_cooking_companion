@@ -22,7 +22,7 @@ function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/signup", {
+      const response = await fetch("http://localhost:8000/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,7 +46,7 @@ function RegisterPage() {
       }
 
       // Redirect to home or dashboard
-      window.location.href = "/";
+      window.location.href = "/kitchen";
     } catch (err) {
       setError(
         err instanceof Error

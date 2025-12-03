@@ -1,10 +1,55 @@
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 
 function Home() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Disable body scrolling on Home page
+    document.body.style.overflow = "hidden";
+
+    // Check if user is logged in
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/auth/me", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          // Redirect to kitchen page if logged in
+          window.location.href = "/kitchen";
+        }
+      } catch (error) {
+        // User not logged in, continue showing home page
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+
+    // Cleanup: re-enable scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen flex items-center justify-center">
+          <p>Loading...</p>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
-      <div className="min-h-screen flex flex-col justify-center items-center text-[#DD0303] px-6 py-16 relative overflow-hidden bg-gradient-to-br from-[#FEF3E2] via-[#FFF8F0] to-[#FEF3E2] bg-[length:400%_400%] animate-[gradient-shift_15s_ease_infinite]">
+      <div className="h-screen flex flex-col justify-center items-center text-[#DD0303] px-6 py-16 relative overflow-hidden bg-gradient-to-br from-[#FEF3E2] via-[#FFF8F0] to-[#FEF3E2] bg-[length:400%_400%] animate-[gradient-shift_15s_ease_infinite]">
         {/* Floating Shapes Background */}
         <div className="absolute w-[200px] h-[200px] rounded-full bg-[radial-gradient(circle,#FA812F,transparent)] top-[10%] left-[10%] opacity-15 blur-[1px] pointer-events-none animate-[float_20s_ease-in-out_infinite]"></div>
         <div className="absolute w-[150px] h-[150px] rounded-full bg-[radial-gradient(circle,#DD0303,transparent)] top-[60%] right-[15%] opacity-15 blur-[1px] pointer-events-none animate-[float-slow_25s_ease-in-out_infinite] [animation-delay:-5s]"></div>
@@ -19,7 +64,7 @@ function Home() {
         {/* Texture Overlay */}
         <div className="absolute inset-0 pointer-events-none opacity-50 bg-[repeating-linear-gradient(45deg,transparent,transparent_2px,rgba(250,129,47,0.02)_2px,rgba(250,129,47,0.02)_4px)]"></div>
 
-        <main className="w-full max-w-3xl text-center space-y-12 relative z-10">
+        <main className="w-full max-w-6xl text-center space-y-12 relative z-10">
           <div className="space-y-0">
             <img
               src="/hestiaLogo.png"
@@ -33,17 +78,18 @@ function Home() {
 
           <section className="space-y-6 w-full max-w-full md:max-w-5xl lg:max-w-6xl mx-auto">
             <div className="space-y-4">
-              <p className="text-2xl md:text-6xl text-[#FA812F] opacity-0 animate-[fade-in-up_0.8s_ease-out_forwards] [animation-delay:0.4s] font-['Montserrat',sans-serif] font-bold tracking-[0.01em]">
+              <p className="text-2xl md:text-6xl text-[#FA812F] opacity-0 animate-[fade-in-up_0.8s_ease-out_forwards] [animation-delay:0.4s] font-['Playfair_Display',serif] font-bold tracking-[0.01em]">
                 Fueling creativity in every kitchen.
               </p>
             </div>
-
-            <p className="text-base md:text-lg text-[#DD0303]/80 leading-relaxed opacity-0 animate-[fade-in-up_0.8s_ease-out_forwards] [animation-delay:0.6s] font-['Montserrat',sans-serif] font-semibold tracking-[0.01em]">
-              We help home cooks push past the ordinary with curated recipes,
-              hands-on guidance, and a community that celebrates
-              experimentation. Create meals that surprise, delight, and bring
-              people together.
-            </p>
+            <div className="max-w-4xl mx-auto">
+              <p className="text-base md:text-lg text-[#DD0303]/80 leading-relaxed opacity-0 animate-[fade-in-up_0.8s_ease-out_forwards] [animation-delay:0.6s] font-['Playfair_Display',serif] font-semibold tracking-[0.01em]">
+                We help home cooks push past the ordinary with curated recipes,
+                hands-on guidance, and a community that celebrates
+                experimentation. Create meals that surprise, delight, and bring
+                people together.
+              </p>
+            </div>
           </section>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 opacity-0 animate-[fade-in-up_0.8s_ease-out_forwards] [animation-delay:0.8s]">

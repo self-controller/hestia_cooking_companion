@@ -37,7 +37,7 @@ function LoginPage() {
       }
 
       // Redirect to home or dashboard
-      window.location.href = "/";
+      window.location.href = "/kitchen";
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An error occurred during login"

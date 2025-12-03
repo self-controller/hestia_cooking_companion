@@ -27,6 +27,8 @@ CORS_ORIGINS = os.getenv(
 
 CORS_ORIGINS = [origin.strip() for origin in CORS_ORIGINS]
 
+DEV_MODE = os.getenv("DEV_MODE", "false").lower() == "true"
+
 # --- Redis (sync redis-py) -------------------------------------
 redis_client: redis.Redis | None = None
 
@@ -66,7 +68,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -82,8 +84,8 @@ def ping_redis(r: redis.Redis = Depends(get_redis)):
     value = r.get("ping")
     return {"redis": value}
 
-@app.post("/signup", response_model=User_out)
-def signup(*, user: User_in, 
+@app.post("/register", response_model=User_out)
+def register(*, user: User_in, 
            db: Session = Depends(get_db), 
            response: Response, 
            r: redis.Redis = Depends(get_redis)
@@ -109,8 +111,7 @@ def signup(*, user: User_in,
     SID = get_uuid()
     response.set_cookie(key="SID", value=SID, max_age=60*60*24, path="/", 
                         samesite="lax", httponly=True, secure=False)        
-    r.setex(name=SID, time=60*60*24, value=str(new_user.id), 
-            path="/", samesite="lax", httponly=True, secure=False) # <-- IMPORTANT -- Change samesite and secure when deploying
+    r.setex(name=SID, time=60*60*24, value=str(new_user.id)) # <-- IMPORTANT -- Change samesite and secure when deploying
     return new_user
 
 @app.get("/auth/me", response_model=User_out)
@@ -118,6 +119,16 @@ def authenticate(SID: Optional[str] = Cookie(None),
                  r: redis.Redis = Depends(get_redis),
                  db: Session = Depends(get_db)
                  ):
+    # Dev mode: return mock user
+    if DEV_MODE:
+        # Return a mock user for development
+        mock_user = User_out(
+            id=1,
+            username="dev_user",
+            email="dev@example.com"
+        )
+        return mock_user
+
     # confirm SID cookie exists
     if not SID:
         raise HTTPException(status_code=401, detail="Not authenticated")
