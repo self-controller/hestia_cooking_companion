@@ -12,8 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 load_dotenv()
 
 # Import your Base and models
-from database import Base
-from models import *  # Import all models so Alembic can detect them
+from database import Base, User, Recipe, RecipeIngredient
 
 # this is the Alembic Config object
 config = context.config

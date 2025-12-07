@@ -6,9 +6,9 @@ from sqlalchemy.exc import IntegrityError
 import redis
 
 from models.schemas import User_in, User_out, LoginRequest
-from helper import hash_password, get_user_by_email, get_uuid, verify_password
+from helper import hash_password, get_user_by_email, get_uuid, verify_password, set_auth_cookie, delete_auth_cookie
 from database import User, get_db
-from dependencies import get_redis
+from dependencies import get_redis, get_current_user
 from config import DEV_MODE
 
 router = APIRouter()
@@ -51,59 +51,31 @@ def register(*, user: User_in,
     db.refresh(new_user)
     # create a cookie for user
     SID = get_uuid()
-    response.set_cookie(key="SID", value=SID, max_age=60*60*24, path="/", 
-                        samesite="lax", httponly=True, secure=False)        
+    set_auth_cookie(response, SID)
     r.setex(name=SID, time=60*60*24, value=str(new_user.id)) # <-- IMPORTANT -- Change samesite and secure when deploying
     return new_user
 
 @router.get("/auth/me", response_model=User_out)
-def authenticate(SID: Optional[str] = Cookie(None), 
+def authenticate(current_user: User = Depends(get_current_user),
+                 response: Response = None,
                  r: redis.Redis = Depends(get_redis),
-                 db: Session = Depends(get_db)
-                 ):
-    # Dev mode: return mock user
+                ) -> User_out:
+    # In dev mode, optionally set a cookie for consistency with frontend
     if DEV_MODE:
-        # Return a mock user for development
-        mock_user = User_out(
-            id=1,
-            username="dev_user",
-            email="dev@example.com"
-        )
-        return mock_user
-
-    # confirm SID cookie exists
-    if not SID:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    
-    # Validate SID exists in Redis
-    user_id_str = r.get(SID)
-    if not user_id_str:
-        raise HTTPException(status_code=401, detail="Invalid or expired session")
-    
-    # Convert user ID from string to int (Redis stores as string)
-    try:
-        user_id = int(user_id_str)
-    except (ValueError, TypeError):
-        raise HTTPException(status_code=401, detail="Invalid session data")
-    
-    # Query database for user by ID
-    query = select(User).where(User.id == user_id)
-    user = db.scalar(query)
-    
-    # Check if user exists
-    if not user:
-        raise HTTPException(status_code=401, detail="User not found")
+        dev_session_id = "dev_session"
+        set_auth_cookie(response, dev_session_id)
+        r.setex(name=dev_session_id, time=60*60*24, value=str(current_user.id))
     
     # Return user data (User_out schema will exclude hash_password)
-    return user
-
+    return current_user
+    
 @router.post("/logout")
 def logout(response: Response, SID: Optional[str] = Cookie(None), r: redis.Redis = Depends(get_redis)):
     # Delete session from Redis if exists
     if SID:
         r.delete(SID)
-    # Delete the cookie from the browser 
-    response.delete_cookie(key="SID")
+    # Delete the cookie from the browser with same parameters as setting
+    delete_auth_cookie(response)
     return {"message": "You have been logged out"}
 
 @router.get("/users")
@@ -124,8 +96,7 @@ def login(*, login_request: LoginRequest,
     if curr_user and verify_password(login_request.password, curr_user.hash_password):
         # create new cookie if verified
         SID = get_uuid()
-        response.set_cookie(key="SID", value=SID, max_age=60*60*24, path="/", 
-                            samesite="lax", httponly=True, secure=False) 
+        set_auth_cookie(response, SID)
         r.setex(name=SID, time=60*60*24, value=str(curr_user.id)) # <-- IMPORTANT -- Change samesite and secure when deploying
         return curr_user
     else:

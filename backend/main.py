@@ -7,6 +7,7 @@ from sqlalchemy import text
 import redis
 from database import init_db, engine
 from routes.routes import router
+from routes.recipes import router as recipes_router
 from dependencies import set_redis_client
 from config import REDIS_URL, CORS_ORIGINS
 
@@ -45,3 +46,4 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(recipes_router)

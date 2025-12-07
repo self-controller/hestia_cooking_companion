@@ -14,4 +14,4 @@ CORS_ORIGINS = os.getenv(
 CORS_ORIGINS = [origin.strip() for origin in CORS_ORIGINS]
 
 # Development mode
-DEV_MODE = os.getenv("DEV_MODE", "false").lower() == "false"
+DEV_MODE = os.getenv("DEV_MODE", "false").lower() == "true"

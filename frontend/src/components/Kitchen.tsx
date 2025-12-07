@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
+import RecipeSearch from "@/components/RecipeSearch";
 
 function Kitchen() {
   const [user, setUser] = useState<{
@@ -41,7 +42,9 @@ function Kitchen() {
       <>
         <Navbar />
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FEF3E2] via-[#FFF8F0] to-[#FEF3E2]">
-          <p className="text-[#DD0303] font-['Montserrat',sans-serif]">Loading...</p>
+          <p className="text-[#DD0303] font-['Montserrat',sans-serif]">
+            Loading...
+          </p>
         </div>
       </>
     );
@@ -56,18 +59,16 @@ function Kitchen() {
             <h1 className="text-4xl md:text-5xl font-black text-[#DD0303] font-['Playfair_Display',serif] tracking-[-0.03em]">
               My Kitchen
             </h1>
-            
+
             {user && (
               <p className="text-lg text-[#DD0303]/80 font-['Montserrat',sans-serif]">
                 Welcome back, {user.username}!
               </p>
             )}
 
-            {/* Add your content here */}
+            {/* Recipe Search Component */}
             <div className="mt-8">
-              <p className="text-[#DD0303]/70 font-['Montserrat',sans-serif]">
-                Your kitchen content will go here.
-              </p>
+              <RecipeSearch />
             </div>
           </div>
         </main>
