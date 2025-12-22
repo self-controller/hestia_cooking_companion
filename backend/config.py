@@ -15,3 +15,7 @@ CORS_ORIGINS = [origin.strip() for origin in CORS_ORIGINS]
 
 # Development mode
 DEV_MODE = os.getenv("DEV_MODE", "false").lower() == "true"
+
+# Spoonacular API config
+SPOONACULAR_API_KEY = os.getenv("SPOONACULAR_API_KEY", "")
+SPOONACULAR_BASE_URL = "https://api.spoonacular.com"

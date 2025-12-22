@@ -43,7 +43,7 @@ class RecipeResponse(BaseModel):
     cook_time: Optional[int] = None
     servings: Optional[int] = None
     source_url: Optional[str] = None
-    user_id: int
+    user_id: Optional[int] = None
     created_at: datetime
     updated_at: datetime
     
@@ -60,3 +60,16 @@ class IngredientSearchRequest(BaseModel):
     match_all: Optional[bool] = False  # If True, recipe must contain all ingredients; if False, any ingredient
     limit: Optional[int] = 20
     offset: Optional[int] = 0
+
+# Spoonacular Schemas (deprecated - keeping for backwards compatibility)
+class SpoonacularRecipeSummary(BaseModel):
+    id: int
+    title: str
+    image: Optional[str] = None
+    imageType: Optional[str] = None
+
+class SpoonacularSearchResponse(BaseModel):
+    results: List[SpoonacularRecipeSummary]
+    offset: int
+    number: int
+    totalResults: int
